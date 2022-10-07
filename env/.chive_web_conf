@@ -1,0 +1,13 @@
+ENV=local
+
+POSTGRES_USER=chive_web
+POSTGRES_PASSWORD=pass1234
+POSTGRES_DB=chive_web
+POSTGRES_PORT=5432
+POSTGRES_SERVICE=chive_web-db
+
+
+SECRET_KEY=django-insecure-z(dqv4*iw9mo8sdcmtcl)7xa*j_22-t+r87ev2@dac4)*02!^g
+
+REDIS_HOST=chive_web-redis
+DJANGO_SETTINGS_MODULE=chive_web.settings.dev

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block tabtitle %}Login{% endblock %}
+{% block title %}Login{% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+<p id="data"> something interesting </p>
+<button class="btn btn-primary" ajax-url='{% url "test" %}'>qq</button>
+<span id="ajax-content"></span>
+{% endblock %}
+
+{% block js %}
+
+<script>
+    $(document).ready(function () {
+        $("button").click(function () {
+            var url = $(this).attr('ajax-url');
+            var ajax_input_data = $('data').html();
+
+            $.ajax({
+                url: url,
+                data: {
+                    'ajax_input_data': ajax_input_data
+                },
+                success: function (return_data) {
+                    $('#ajax-content').html(return_data);
+                }
+            })
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}Gpumining{% endblock %}
+{% block content %}
+
+<div class="input-group">
+    <input type="text" id="powercost" value="5">
+    <div class="input-group-append">
+        <span class="input-group-text">Power Cost (TWD/kwh)</span>
+    </div>
+</div>
+
+<div id="gpu-list">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col" id="model">Model</th>
+                <th scope="col" id="algo">Algorithm</th>
+                <th scope="col" id="power">Power (W)</th>
+                <th scope="col" id="profit">Est. Profit (TWD/day)</th>
+                <th scope="col" id="price">GPU Price (TWD)</th>
+                <th scope="col" id="quantity">Quantity (PCS)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for gpu in gpus %}
+            <tr class="gpu">
+                <td id="{{ gpu.model }}" class="align-middle">{{ gpu.model }}</td>
+                <td class="align-middle algo">{{ gpu.algo }}</td>
+                <td class="align-middle power">{{ gpu.power }}</td>
+                <td class="align-middle profit">{{ gpu.profit}}</td>
+                <td class="align-middle price">{{ gpu.price }}</td>
+                <td>
+                    <select>
+                        <option>0</option>
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                    </select>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<table class="table table-hover">
+    <thead>
+        <tr class="table-success">
+            <th scope="col">Profit (TWD/day)</th>
+            <th scope="col">Power Cost (TWD/day)</th>
+            <th scope="col">Net Profit (TWD/day)</th>
+            <th scope="col">Price (TWD)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr id="miningdash">
+            <td class="align-middle">0</td>
+            <td class="align-middle">0</td>
+            <td class="align-middle">0</td>
+            <td class="align-middle">0</td>
+        </tr>
+    </tbody>
+</table>
+<button type="button" class="btn btn-primary summit">Submit Order</button>
+<!-- $.ajax({
+type: 'POST',
+url: url,
+data: data,
+success: success,
+dataType: dataType
+}); -->
+
+{% endblock %}
+
+{% block js %}
+<script>
+    $(document).ready(function () {
+
+        var myFunction = function () {
+            var day_profit = 0;
+            var day_cost = 0;
+            var total_price = 0;
+            var power_cost = parseFloat($("input#powercost").val())
+            $("tr.gpu").each(function (index) {
+                day_profit += parseFloat($("option:selected", this).text()) * parseFloat($(
+                    "td.profit", this).text());
+                day_cost += parseFloat($("option:selected", this).text()) *
+                    parseFloat($("td.power", this).text()) / 1000 * power_cost * 24;
+                total_price += parseFloat($("option:selected", this).text()) *
+                    parseFloat($("td.price", this).text());
+            });
+
+            //day profit
+            $("tr#miningdash td.align-middle:eq(0)").html(day_profit.toFixed(1));
+            //day cost 
+            $("tr#miningdash td.align-middle:eq(1)").html(day_cost.toFixed(1));
+            //net cost
+            $("tr#miningdash td.align-middle:eq(2)").html((day_profit - day_cost).toFixed(1))
+            //price
+            $("tr#miningdash td.align-middle:eq(3)").html((total_price))
+        };
+        $("tr select").change(myFunction)
+        $("input#powercost").change(myFunction)
+
+        $("button").click(function () {
+            // $.post("http://localhost:8000/api/orders/", {
+            //     email: "123@wqd.com",
+            // }, );
+            $.ajax({
+                    url: "/api/orders/",
+                    method: "POST",
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    data: {
+                        email: "1223123@wqd.com"
+                    },
+                    dataType: "json"
+
+                })
+                .done(function () {
+                    alert("Order Created.");
+                })
+                .fail(function (jqXHR) {
+
+                    alert(jqXHR.responseText);
+                });
+
+
+        });
+
+
+    });
+</script>
+{% endblock %}

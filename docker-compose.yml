@@ -1,0 +1,54 @@
+# for chive_web project
+version: '3.9'
+services:
+  # chive_web
+  chive_web-db:
+    restart: always
+    image: postgres:13-alpine
+    volumes:
+      - chive_web-pg-backup-data:/var/lib/postgresql/data
+    env_file:
+      - ./env/.dev
+      - ./env/.chive_web_conf
+    networks:
+      - chive_web
+    ports:
+      - "5432:5432"
+
+  chive_web-redis:
+    restart: always
+    image: redis:6.2.4-alpine
+    volumes:
+      - redis-data:/data
+    networks:
+      - chive_web
+    ports:
+      - "6379:6379"
+
+  chive_web:
+    image: chive_web
+    restart: always
+    build: ./chive_web
+    depends_on:
+      chive_web-db:
+        condition: service_started
+      chive_web-redis:
+        condition: service_started
+    networks:
+      - chive_web
+    env_file:
+      - ./env/.dev
+      - ./env/.chive_web_conf
+    volumes:
+      - ./chive_web:/app/
+    ports:
+      - "8000:8000"
+    command: >
+      bash -c "python manage.py runserver 0.0.0.0:8000"
+networks:
+  chive_web:
+    driver: bridge
+
+volumes:
+  chive_web-pg-backup-data: # chive_web db
+  redis-data: # chive_web cache

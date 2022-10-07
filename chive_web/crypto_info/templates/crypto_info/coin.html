@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block tabtitle %}Coin Price{% endblock %}
+{% block title %}Coin Price{% endblock %}
+{% block content %}
+
+
+<div id="price">
+    {% for coin in coin %}
+    <hp>{{coin.symbol}} : {{coin.price}}</p>
+        {% endfor %}
+</div>
+<br>
+
+<h3>From</h3>
+<select id="coin-1" class="form-control">
+    {% for coin in coin %}<option>{{coin.symbol}}</option>{% endfor %}
+</select>
+<h3>To</h3>
+<select id="coin-2" class="form-control">
+    {% for coin in coin %}<option>{{coin.symbol}}</option>{% endfor %}
+</select>
+<br>
+
+<button id="coin-convert" type="button" class="btn btn-secondary btn-lg btn-block">Convert</button>
+<br>
+
+<div id="convert-result" class="alert alert-secondary" role="alert">Result</div>
+<br>
+
+
+<script type="text/javascript">
+    //if window.location.protocol == https >wss  if not >ws
+    const wss_protocol =
+        window.location.protocol == 'https:' ? 'wss://' : 'ws://';
+
+    //  >wss://window.location.host/ws/socket-server
+    const coinSocket = new WebSocket(
+        wss_protocol + window.location.host + '/ws/price'
+    );
+
+    coinSocket.onmessage = function (event) {
+
+        var data = JSON.parse(event.data);
+        // if receive price ratio result
+        if (data['price_ratio']) {
+            console.log(data)
+            var price_ratio = document.getElementById('convert-result');
+            price_ratio.textContent = '1 ' + data['coin_1'] + ' = ' + data['price_ratio'] + ' ' + data['coin_2']
+
+            // receive else data <coin_data> should be else if data['coin_data']
+        } else {
+            var listLength = data.length;
+
+            var coin_price = document.getElementById('price');
+            coin_price.textContent = '';
+            var coin = '';
+            for (var i = 0; i < listLength; i++) {
+                coin +=
+                    '<p>' +
+                    data[i]['symbol'] + ' : ' + data[i]['price'] +
+                    '</p>'
+            };
+            coin_price.innerHTML = coin;
+        };
+    }
+
+    document.querySelector("#coin-convert").onclick = function (e) {
+        const coin_1_symbol = document.querySelector("#coin-1").value;
+        const coin_2_symbol = document.querySelector("#coin-2").value;
+
+        coinSocket.send(
+            p = JSON.stringify({
+                message: [coin_1_symbol, coin_2_symbol]
+            })
+        );
+        console.log(p)
+
+        coin_1_symbol.value = "";
+        coin_2_symbol.value = "";
+    }
+</script>
+
+{% endblock %}
