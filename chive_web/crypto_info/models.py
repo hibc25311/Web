@@ -5,7 +5,7 @@ from django.db import models
 class CryptoNews(models.Model):
 
     news_url = models.URLField(max_length=200, unique=True)
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=150)
     img_url = models.URLField(max_length=200)
     media_info = models.CharField(max_length=80)
     post_time = models.DateTimeField()

@@ -18,5 +18,5 @@ def coin(request):
 
 
 def news(request):
-    news = CryptoNews.objects.all()
+    news = CryptoNews.objects.all().order_by('-post_time')
     return render(request, 'crypto_info/news.html', {'news': news})

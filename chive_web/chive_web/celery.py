@@ -8,14 +8,15 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 
 CELERY_BROKER_URL = 'redis://chive_web-redis:6379'
 
+app.autodiscover_tasks()
+
 app.conf.beat_schedule = {
-    'get_coins_data_10': {
+    'get_coins_data_20': {
         'task': 'crypto_info.tasks.get_coins_data_binance',
-        'schedule': 10
+        'schedule': 20
     },
-    'get_binance_news_10s': {
+    'get_binance_news_120s': {
         'task': 'crypto_info.tasks.get_binance_news',
-        'schedule': 10
+        'schedule': 120
     }
 }
-app.autodiscover_tasks()
